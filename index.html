@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>data.table 教程2－语义引用 | 行行重行行</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="目录：     data.table 介绍    语义引用       主键、基于二分法搜索的subset     二次索引和自动索引    数据拆分和合并     原文地址：data.table/wiki/Getting-started  本教程讨论data.table的语义引用，它允许通过引用来add/update/delete列，然后通过参数i和by结合。它主要给那些熟悉data.table">
+<meta name="keywords" content="R,data.table">
+<meta property="og:type" content="article">
+<meta property="og:title" content="data.table 教程2－语义引用">
+<meta property="og:url" content="https://youngspring1.github.io/2016/2016-03-21-datatable2/index.html">
+<meta property="og:site_name" content="行行重行行">
+<meta property="og:description" content="目录：     data.table 介绍    语义引用       主键、基于二分法搜索的subset     二次索引和自动索引    数据拆分和合并     原文地址：data.table/wiki/Getting-started  本教程讨论data.table的语义引用，它允许通过引用来add/update/delete列，然后通过参数i和by结合。它主要给那些熟悉data.table">
+<meta property="og:updated_time" content="2017-10-15T12:50:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="data.table 教程2－语义引用">
+<meta name="twitter:description" content="目录：     data.table 介绍    语义引用       主键、基于二分法搜索的subset     二次索引和自动索引    数据拆分和合并     原文地址：data.table/wiki/Getting-started  本教程讨论data.table的语义引用，它允许通过引用来add/update/delete列，然后通过参数i和by结合。它主要给那些熟悉data.table">
+  
+    <link rel="alternate" href="/atom.xml" title="行行重行行" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">行行重行行</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://youngspring1.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2016-03-21-datatable2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/2016-03-21-datatable2/" class="article-date">
+  <time datetime="2016-03-21T03:56:45.000Z" itemprop="datePublished">2016-03-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/data-table教程/">data.table教程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      data.table 教程2－语义引用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>目录：   </p>
+<ol>
+<li><a href="http://youngspring1.github.io/post/2016/2016-03-13-datatable1/">data.table 介绍</a>   </li>
+<li><a href="http://youngspring1.github.io/post/2016/2016-03-21-datatable2/">语义引用</a>      </li>
+<li><a href="http://youngspring1.github.io/post/2016/2016-03-22-datatable3/">主键、基于二分法搜索的subset</a>    </li>
+<li><a href="http://youngspring1.github.io/post/2016/2016-04-02-datatable4/">二次索引和自动索引</a>   </li>
+<li><a href="http://youngspring1.github.io/post/2016/2016-04-08-datatable5/">数据拆分和合并</a>   </li>
+</ol>
+<p>原文地址：<br><a href="https://github.com/Rdatatable/data.table/wiki/Getting-started" target="_blank" rel="external">data.table/wiki/Getting-started</a></p>
+<hr>
+<p>本教程讨论data.table的语义引用，它允许通过引用来add/update/delete列，然后通过参数i和by结合。它主要给那些熟悉data.table语法、知道如何subset行／select列／分组的人使用。如果你对这些不熟悉，请学习上一讲 <a href="http://youngspring1.github.io/post/2016-03-13-datatable1/">data.table 介绍</a>。   </p>
+<hr>
+<h2 id="数据"><a href="#数据" class="headerlink" title="数据"></a>数据</h2><p>我们继续使用上一讲中使用的航班信息flights。</p>
+<pre><code>flights &lt;- fread(&quot;https://raw.githubusercontent.com/wiki/arunsrinivasan/    flights/NYCflights14/flights14.csv&quot;)
+flights
+#         year month day dep_time dep_delay arr_time arr_delay cancelled carrier tailnum flight
+#      1: 2014     1   1      914        14     1238        13         0      AA  N338AA      1
+#      2: 2014     1   1     1157        -3     1523        13         0      AA  N335AA      3
+#      3: 2014     1   1     1902         2     2224         9         0      AA  N327AA     21
+#      4: 2014     1   1      722        -8     1014       -26         0      AA  N3EHAA     29
+#      5: 2014     1   1     1347         2     1706         1         0      AA  N319AA    117
+#     ---                                                                                      
+# 253312: 2014    10  31     1459         1     1747       -30         0      UA  N23708   1744
+# 253313: 2014    10  31      854        -5     1147       -14         0      UA  N33132   1758
+# 253314: 2014    10  31     1102        -8     1311        16         0      MQ  N827MQ   3591
+# 253315: 2014    10  31     1106        -4     1325        15         0      MQ  N511MQ   3592
+# 253316: 2014    10  31      824        -5     1045         1         0      MQ  N813MQ   3599
+#         origin dest air_time distance hour min
+#      1:    JFK  LAX      359     2475    9  14
+#      2:    JFK  LAX      363     2475   11  57
+#      3:    JFK  LAX      351     2475   19   2
+#      4:    LGA  PBI      157     1035    7  22
+#      5:    JFK  LAX      350     2475   13  47
+#     ---                                       
+# 253312:    LGA  IAH      201     1416   14  59
+# 253313:    EWR  IAH      189     1400    8  54
+# 253314:    LGA  RDU       83      431   11   2
+# 253315:    LGA  DTW       75      502   11   6
+# 253316:    LGA  SDF      110      659    8  24
+dim(flights)
+# [1] 253316     17
+</code></pre><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在这一讲，我们会：   </p>
+<pre><code>* 简要讨论“语义引用”，然后比较操作符“:=”的两种不同的形式。
+* 学习如何在参数j里面使用操作符“:=”来add/update/delete列，如何与参数i和by相结合。
+* 了解操作符“:=”的副作用，并学习如何用 copy() 来避免这些副作用。
+</code></pre><h2 id="1-语义引用"><a href="#1-语义引用" class="headerlink" title="1. 语义引用"></a>1. 语义引用</h2><p>到目前为止，我们学习到的所有的操作都会生成一个新的数据集。接下来，我们会学习如何在原来数据集的基础上，添加／更新／删除那些已经存在的列。      </p>
+<h4 id="a-背景"><a href="#a-背景" class="headerlink" title="a) 背景"></a>a) 背景</h4><p>在学习语义引用之前，我们先来看下面这个data.frame：   </p>
+<pre><code>DF = data.frame(ID = c(&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;a&quot;,&quot;a&quot;,&quot;c&quot;), a = 1:6, b = 7:12, c=13:18)
+DF
+#   ID a  b  c
+# 1  b 1  7 13
+# 2  b 2  8 14
+# 3  b 3  9 15
+# 4  a 4 10 16
+# 5  a 5 11 17
+# 6  c 6 12 18
+</code></pre><p>当我们执行下面的命令：   </p>
+<pre><code>DF$c &lt;- 18:13               # (1) -- replace entire column
+# or
